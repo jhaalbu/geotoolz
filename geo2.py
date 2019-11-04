@@ -232,13 +232,13 @@ class geoLagPakke(object):
     
         return               
 
-    def jordtrykk(self, kfaktor=a):
-        '''
-        Gi inn jordtrykksfaktor som a = aktiv, 0 = k0 eller p som passiv
-        Returnerer samla jordtrykk i kN 
-        '''
-        if kfaktor == a:
-            for lag in self.lagliste:
+    # def jordtrykk(self, kfaktor=a):
+    #     '''
+    #     Gi inn jordtrykksfaktor som a = aktiv, 0 = k0 eller p som passiv
+    #     Returnerer samla jordtrykk i kN 
+    #     '''
+    #     if kfaktor == a:
+    #         for lag in self.lagliste:
                 
 
 leire = GeoLag('leire', 3, 18)
