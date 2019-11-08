@@ -12,13 +12,14 @@ import numpy as np
 
 
 class GeoLag(object):
-    def __init__(self, jordart, mektighet=1, gamma=18):
+    def __init__(self, jordart, ztopp, zbunn, gamma=18):
         self.jordart = jordart
-        self.mektighet = mektighet
-        #self.ztopp = ztopp
-        #self.zbunn = zbunn
+        #self.mektighet = mektighet
+        self.ztopp = ztopp
+        self.zbunn = zbunn
         self.gamma = gamma
-        #self.mektighet = zbunn - ztopp
+        self.mektighet = zbunn - ztopp
+        print(self.mektighet)
         self.gamma_m = 1
         
         
@@ -104,40 +105,77 @@ class geoLagPakke(object):
         u: grunnvassnivå
     '''
     
-    def __init__(self, lagliste, u):
+    def __init__(self, lagliste, u, metode=1):
         '''
         Initmetoden etablerer spenningsfordeling i lagpakken til vidare bruk i metoder
+        
+        Parameter:
+        Tar inn ei liste av geolaginstanser, grunnvannsnivå samt metode kan velges til å
+        vere enten 1 som gir jevn graf uten sprang ved lagskifte, eller hakkete graf der det er sprang runt lagskifte
+        TODO: Implementere mulighet for å gi z verdier eller mektighet for lagpakke
         '''
-        
         self.lagliste = lagliste
-        self.djupne = [0]
-        self.pv = [0]
-        self.pv_eff = [0]
-        self.u_liste = [0]
-        self.gamma = [0]
+        self.metode = metode
               
+        if self.metode == 1:
+            self.djupne = []
+            self.pv = []
+            self.pv_eff = [0]
+            self.u_liste = [0]
+            self.gamma = []
+            for lag in self.lagliste:
+                
+                templiste = list(range(lag.ztopp, lag.zbunn+1))
+                for i in templiste:
+                    self.djupne.append(i)
+                    if i == 0:
+                        self.gamma.append(0)
+                        self.pv.append(0)
+                    else:
+                        self.gamma.append(lag.gamma)
+                        self.pv.append(self.pv[-1] + lag.gamma)
+            print(self.djupne, len(self.djupne))
+            print(self.gamma, len(self.gamma))
+            print(self.pv, len(self.pv))
         
-        for lag in self.lagliste:
-            for i in range(lag.mektighet):
-                if len(self.djupne) == 0:
-                    self.djupne.append(1)
+            for i in self.djupne:
+                if i < u:
+                    self.u_liste.append(0)
                 else:
-                    self.djupne.append(self.djupne[-1]+1)
+                    self.u_liste.append(self.u_liste[-1]+10)
+            del self.u_liste[-1] 
+
+            print(self.u_liste, len(self.u_liste))
         
-        for lag in self.lagliste:
-            for i in range(lag.mektighet):
-                self.gamma.append(lag.gamma)
-        
-        for lag in self.lagliste:
-            for i in range(lag.mektighet):
-                self.pv.append(self.pv[-1] + lag.gamma)
-        
-        for i in self.djupne:
-            if i < u:
-                self.u_liste.append(0)
-            else:
-                self.u_liste.append(self.u_liste[-1]+10)
-        del self.u_liste[-1] 
+        elif self.metode == 2:
+            self.djupne = [0]
+            self.pv = [0]
+            self.pv_eff = [0]
+            self.u_liste = [0]
+            self.gamma = [0]
+            for lag in self.lagliste:
+                for i in range(lag.mektighet):
+                    if len(self.djupne) == 0:
+                        self.djupne.append(1)
+                    else:
+                        self.djupne.append(self.djupne[-1]+1)
+            
+            for lag in self.lagliste:
+                for i in range(lag.mektighet):
+                    self.gamma.append(lag.gamma)
+            
+            for lag in self.lagliste:
+                for i in range(lag.mektighet):
+                    self.pv.append(self.pv[-1] + lag.gamma)
+            
+            for i in self.djupne:
+                if i < u:
+                    self.u_liste.append(0)
+                else:
+                    self.u_liste.append(self.u_liste[-1]+10)
+            del self.u_liste[-1] 
+
+
                 
         self.lagdf = pd.DataFrame(self.djupne)
         self.lagdf.columns = ['Djupne']
@@ -162,15 +200,28 @@ class geoLagPakke(object):
             KKORRIGERT HAR TRULEG FEIL FORMEL!!
         '''
 
-        
-        self.aktiv_trykk = [0]
-        
-        for lag in self.lagliste:
-            s = ((math.tan(math.radians(beta)))/(lag.ro))
-            t = ((1 + r) * (1 - s))
-            ka = 1/(((math.sqrt(1 + (math.tan(lag.tanro)) ** 2)) + math.atan(lag.tanro) * math.sqrt(t)) ** 2)
-            for i in range(lag.mektighet):
-                self.aktiv_trykk.append(ka)
+        if self.metode == 1:
+            self.aktiv_trykk = []
+            for lag in self.lagliste:
+                s = ((math.tan(math.radians(beta)))/(lag.ro))
+                t = ((1 + r) * (1 - s))
+                ka = 1/(((math.sqrt(1 + (math.tan(lag.tanro)) ** 2)) + math.atan(lag.tanro) * math.sqrt(t)) ** 2)
+                
+                templiste = list(range(lag.ztopp, lag.zbunn+1))
+                for i in templiste:
+                    if i == 0:
+                        self.aktiv_trykk.append(0)  
+                    else:  
+                        self.aktiv_trykk.append(ka)
+        elif self.metode == 2:
+            self.aktiv_trykk = [0]
+            for lag in self.lagliste:
+                s = ((math.tan(math.radians(beta)))/(lag.ro))
+                t = ((1 + r) * (1 - s))
+                ka = 1/(((math.sqrt(1 + (math.tan(lag.tanro)) ** 2)) + math.atan(lag.tanro) * math.sqrt(t)) ** 2)
+                
+                for i in range(lag.mektighet):
+                    self.aktiv_trykk.append(ka)      
         #del self.aktiv_trykk[-1]             
         print('ka: ', self.aktiv_trykk)
         print(len(self.aktiv_trykk))
@@ -180,10 +231,23 @@ class geoLagPakke(object):
 
     def k0(self, beta=0, r=0):
         
-        self.k0_spenning = [0]
-        for lag in self.lagliste:
-            for i in range(lag.mektighet):
-                self.k0_spenning.append(lag.k0)        
+        if self.metode == 1:
+            self.k0_spenning = []
+            for lag in self.lagliste:
+                
+                templiste = list(range(lag.ztopp, lag.zbunn+1))
+                for i in templiste:
+                    if i == 0:
+                        self.k0_spenning.append(0)  
+                    else:  
+                        self.k0_spenning.append(lag.k0)
+
+        elif self.metode == 2:
+            self.k0_spenning = [0]
+            for lag in self.lagliste:
+                
+                for i in range(lag.mektighet):
+                    self.k0_spenning.append(lag.k0)     
         print('k0: ', self.k0_spenning)
         print(len(self.k0_spenning))
         self.lagdf['K0'] = self.k0_spenning
@@ -241,11 +305,11 @@ class geoLagPakke(object):
     #         for lag in self.lagliste:
                 
 
-leire = GeoLag('leire', 3, 18)
+""" leire = GeoLag('leire', 0, 3, 18)
 leire.sett_styrke_parameter(25, 3)
-silt = GeoLag('silt', 5, 20)
+silt = GeoLag('silt', 3, 8, 20)
 silt.sett_styrke_parameter(32, 5)
-morene = GeoLag('morene', 8, 19)
+morene = GeoLag('morene', 8, 15, 19)
 morene.sett_styrke_parameter(38, 10)
 
 lagliste = [leire, silt, morene]
@@ -257,4 +321,4 @@ lagpakke.spennings_plott()
 print(lagpakke.k0())
 print(lagpakke.aktiv())
 print(lagpakke.lagdf)
-lagpakke.jordtrykks_plott()
+lagpakke.jordtrykks_plott() """
