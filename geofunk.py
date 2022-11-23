@@ -155,10 +155,10 @@ def reduksjonsfaktor(helling_forhold):
 
     return fsa, fsq
 
-def grunntrykk(lagpakke, djupne, gamma_eff, fsq, Nq, Ngamma, b0, attraksjon):
-    p_eff = lagpakke.loc[(lagpakke["Djupne"] == djupne), "Pv'"]
-    gamma_eff = 
-    return fsq * (Nq * p_eff) + (0.5 * Ngamma * gamma_eff * b0) + (Nq * fsa -1) * attraksjon
+# def grunntrykk(lagpakke, djupne, gamma_eff, fsq, Nq, Ngamma, b0, attraksjon):
+#     p_eff = lagpakke.loc[(lagpakke["Djupne"] == djupne), "Pv'"]
+#     gamma_eff = 
+#     return fsq * (Nq * p_eff) + (0.5 * Ngamma * gamma_eff * b0) + (Nq * fsa -1) * attraksjon
 
 def virkelig_helling(vinkel_mot_terreng, vinkel_skjæring):
     tan_alpha = math.tan(math.radians(vinkel_skjæring))
@@ -173,4 +173,4 @@ def virkelig_helling(vinkel_mot_terreng, vinkel_skjæring):
 #print(jordtrykksfaktor_k0(0.30))
 #print(n_fakt(0.78/1.4, 0.17, 2))
 
-print(virkelig_helling(45, 33))
+print(virkelig_helling(45, 33))  
