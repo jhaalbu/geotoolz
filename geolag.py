@@ -82,10 +82,6 @@ class GeoLag(object):
     
        
 
-
-
-
-
 class geoLagPakke(object):
     '''
     Etablerer ein lagpakke av geolag for å plotte ut spenningsplot og utføre geotekniske berekningar
@@ -221,18 +217,18 @@ class geoLagPakke(object):
 # morene = GeoLag('morene', 800, 1500, 40)
 # morene.sett_styrke_parameter(38, 10)
 
-sand = GeoLag('sand', 0, 600, 18)
-sand.sett_styrke_parameter(36, 3)
+# sand = GeoLag('sand', 0, 600, 18)
+# sand.sett_styrke_parameter(36, 3)
 
-# lagliste = [leire, silt, morene]
-lagliste = [sand]
-# lagpakke = geoLagPakke(lagliste, 3)
-lagpakke = geoLagPakke(lagliste, 4)
-# print(leire)
-lagpakke.aktiv()
-lagpakke.k0()
+# # lagliste = [leire, silt, morene]
+# lagliste = [sand]
+# # lagpakke = geoLagPakke(lagliste, 3)
+# lagpakke = geoLagPakke(lagliste, 4)
+# # print(leire)
+# lagpakke.aktiv()
+# lagpakke.k0()
 
-lagpakke.spennings_plott()
+# lagpakke.spennings_plott()
 
-# print(lagpakke.lagdf)
-lagpakke.jordtrykks_plott()
+# # print(lagpakke.lagdf)
+# lagpakke.jordtrykks_plott()
