@@ -173,4 +173,4 @@ def virkelig_helling(vinkel_mot_terreng, vinkel_skjæring):
 #print(jordtrykksfaktor_k0(0.30))
 #print(n_fakt(0.78/1.4, 0.17, 2))
 
-print(virkelig_helling(45, 33))
+print(virkelig_helling(45, 33))  
