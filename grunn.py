@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import math
 import geofunk
 
@@ -8,7 +9,7 @@ class JordLag(object):
         self.lagnavn = lagnavn
         self.startdybde = startdybde
         self.sluttdybde = sluttdybde
-        self.gamma = gamma
+        self.gamma = gamma/100
         if self.startdybde == None:
             self.mektighet = mektighet
         else:
@@ -53,16 +54,42 @@ class JordLag(object):
             return
         else:
             return
-
+#TODO: I jordprofilklassen er det ein bug som gjer at det blir ein cm ekstra per lag
+#       Antar denne buggen kjem fra at alle lag startar med 0 cm, ein ekstra cm her
 class JordProfil(object):
 
-    def __init__(self, jordarter) -> None:
+    def __init__(self, jordarter, u=1.0) -> None:
         self.jordarter = jordarter
+        self.u = u
         self.df = pd.concat([jordlag.df for jordlag in self.jordarter],
                             keys=[jordlag.lagnavn for jordlag in self.jordarter])
         self.df['djupne'] = range(0, len(self.df))
+        self.df['djupne_meter'] = self.df["djupne"]/100
         self.df = self.df.set_index('djupne')
-        print(self.df)
+        self.df['u'] = 0
+        self.df.loc[self.df["djupne_meter"] > self.u, 'u'] = self.df['djupne_meter'] * 10 - self.u*10
+        self.df["sigma_v0"] = self.df['gamma'].cumsum().shift(1, fill_value=0) - self.df['u']
+        #print(self.df)
+
+    def setning_uendelig(self, q):
+        self.df['delta_p'] = q
+        self.df = self.df.assign(toyning=lambda x:(1/x.m) * np.log((x.sigma_v0 + q)/x.sigma_v0))
+        self.df = self.df.replace([np.inf, -np.inf], 0)
+        self.df['delta_sigma'] = self.df['toyning'] * 0.01
+        return
+    
+    def setning_endelig(self, q, b, l):
+        z0 = np.pi*((b*l)/(b+l))
+        print(f'z0 = {z0}')
+        self.df['delta_p'] = q * (1-(self.df.index / z0))
+        self.df.loc[self.df['delta_p']<0,'delta_p']=0
+        self.df = self.df.assign(toyning=lambda x:(1/x.m) * np.log((x.sigma_v0 + x.delta_p)/x.sigma_v0))
+        self.df = self.df.replace([np.inf, -np.inf], 0)
+        self.df['delta_sigma'] = self.df['toyning'] * 0.01
+        return
+        
+    def total_setning(self):
+        return round(self.df['delta_sigma'].sum(),3)
 
 
 
