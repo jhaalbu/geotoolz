@@ -1,4 +1,5 @@
 import grunn
+import matplotlib.pyplot as plt
 
 lag1 = grunn.JordLag("Leire", 400, 18)
 #lag2 = grunn.JordLag("Sand", 470, 16)
@@ -14,11 +15,14 @@ lag1.sett_stivhet(m=10)
 #jordlagliste = [lag1, lag2, lag3]
 jordlagsliste = [lag1]
 #print(jordlagliste)
-profil1 = grunn.JordProfil(jordlagsliste, 0)
-profil1.setning_endelig(60, b=1000, l=1000)
-print(profil1.df)
-print(profil1.total_setning())
+#profil1 = grunn.JordProfil(jordlagsliste, 0)
+#profil1.setning_endelig(60, b=1000, l=1000)
+#print(profil1.df)
+#print(profil1.total_setning())
 profil2 = grunn.JordProfil(jordlagsliste, 0)
 profil2.setning_uendelig(60)
 print(profil2.df)
 print(profil2.total_setning())
+fig, ax1 = plt.subplots(1,1,figsize=(4, 6))
+ax1, ax2 = profil2.plot_toyning()
+plt.show()
