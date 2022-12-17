@@ -82,10 +82,6 @@ class GeoLag(object):
     
        
 
-
-
-
-
 class geoLagPakke(object):
     '''
     Etablerer ein lagpakke av geolag for å plotte ut spenningsplot og utføre geotekniske berekningar
@@ -220,4 +216,5 @@ class geoLagPakke(object):
 # silt.sett_styrke_parameter(32, 5)
 # morene = GeoLag('morene', 800, 1500, 40)
 # morene.sett_styrke_parameter(38, 10)
+
 

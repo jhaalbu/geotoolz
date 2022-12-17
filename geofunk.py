@@ -1,5 +1,5 @@
 import math
-import geofunk
+
 
 
 def ekvivalent_attraksjon(dm, l, sigma_m):
