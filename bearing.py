@@ -4,12 +4,12 @@ import pandas as pd
 import numpy as np
 from scipy.interpolate import splrep, splev, interp1d
 import matplotlib.ticker as ticker
-import streamlit as st
+#import streamlit as st
 
-tanr_B3 = st.number_input('tan ro', min_value=0.0, max_value=1.0, value=0.55, step=0.05)
+tanr_B3 = 0.577
 tanac_B4 = tanr_B3 + math.sqrt(1+(tanr_B3**2))
-b_B5 = st.number_input('B0', min_value=0.1, max_value=10.0, value=4.0, step=0.1)
-r_B6 = 0.5
+b_B5 = 1
+r_B6 = 0.8
 if r_B6 == 0:
     r_B6 = 0.00000000000001
 if r_B6 == 1:
@@ -258,5 +258,5 @@ ax1.set_xlabel("Horisontal (m)")
 #Pil
 
 plt.show()
-st.pyplot(fig)
+#st.pyplot(fig)
 
