@@ -127,7 +127,7 @@ def n_fakt(tan_ro, ruhet, helling=10000):
         
     return Nq, N_gamma    
 
-def reduksjonsfaktor(helling_forhold):
+def reduksjonsfaktor_beta(helling_forhold):
     if helling_forhold == 0:
         fsq = 1
         fsa = 1
@@ -155,6 +155,10 @@ def reduksjonsfaktor(helling_forhold):
 
     return fsa, fsq
 
+def reduksjonsfaktor_v220(helling_forhold, tan_fi_d):
+    fsq = (1-(0.55*helling_forhold))**5
+    fsa = math.e**(-2*math.tan(helling_forhold)*tan_fi_d)
+    return fsa, fsq
 # def grunntrykk(lagpakke, djupne, gamma_eff, fsq, Nq, Ngamma, b0, attraksjon):
 #     p_eff = lagpakke.loc[(lagpakke["Djupne"] == djupne), "Pv'"]
 #     gamma_eff = 
@@ -167,10 +171,33 @@ def virkelig_helling(vinkel_mot_terreng, vinkel_skjæring):
 
     return round(math.degrees(math.atan(tan_delta)), 2)
 
+def a_c_plus(ro):
+    return (math.pi/4) + (ro/2)
+
+def tan_ac_plus(ro):
+    return math.tan(ro) + math.sqrt(1 + ((math.tan(ro))**2))
+
+def fw(r):
+    return (1/r)*(1 - (math.sqrt(1-r**2)))
+
+def tan_omega(fw, tan_ac_plus):
+    return fw * tan_ac_plus
+
+def qv(b0, fv):
+    return fv/b0
+
+def qv_dict(jordlag, b0_min, b0_maks, fv, **kwargs):
+    qv_dict = {}
+    for i in range(int(b0_min*100), int(b0_maks*100)):
+        qv_dict[i/100] = qv(i/100, fv+fv_delta(jordlag.gamma))
+
+
+def delta_fv(gamma, z, u, b0):
+    return gamma*z*b0
 
 
 #print(jordtrykksfaktor_ka(0.30))
 #print(jordtrykksfaktor_k0(0.30))
 #print(n_fakt(0.78/1.4, 0.17, 2))
 
-print(virkelig_helling(45, 33))  
+#print(virkelig_helling(45, 33))  
