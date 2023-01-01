@@ -195,6 +195,19 @@ def qv_dict(jordlag, b0_min, b0_maks, fv, **kwargs):
 def delta_fv(gamma, z, u, b0):
     return gamma*z*b0
 
+def stråle_r1(b0, beta1, beta3):
+    return b0 * (math.sin(beta1))/(math.sin(beta3))
+
+def stråle_r2(r1, theta, ro):
+    return r1 * math.exp(theta * math.tan(ro))
+
+def r2_punkt(beta4, r2, botn_fundament=0):
+    '''
+    TODO: Kva med fundament anna enn y=0
+    '''
+    z = r2*math.sin(beta4) - botn_fundament
+    x = r2*math.cos(beta4)
+    return x,-z
 
 #print(jordtrykksfaktor_ka(0.30))
 #print(jordtrykksfaktor_k0(0.30))

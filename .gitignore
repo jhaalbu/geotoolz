@@ -1,4 +1,8 @@
-.ipynb_checkpoints
+.ipynb_checkpoints/
 __pycache__/
 virtual/
-.vscode
+.vscode/
+.pytest_cache/
+insar-points.csv
+__pycache__/
+.gitignore
