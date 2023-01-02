@@ -4,5 +4,5 @@ virtual/
 .vscode/
 .pytest_cache/
 insar-points.csv
-__pycache__/
+__pycache__
 .gitignore
