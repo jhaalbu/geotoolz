@@ -8,7 +8,7 @@ class SoneGeometri:
     def __init__(self, fundament, jordprofil, x_avsett_fund=0):
         self.b0 = fundament.b0
         self.botn_fundament = fundament.z
-        self.tykkelse_fundament = fundament.tykkelse
+        self.tykkelse_fundament = fundament.fundament_tykkelse
         self.gamma_m = fundament.gamma_m
         self.tan_phi_lag1 = jordprofil.get_tan_phi_lag(0)
         self.phi_lag1 = jordprofil.get_phi_lag(0)
