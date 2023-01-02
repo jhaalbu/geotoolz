@@ -30,9 +30,9 @@ class SoneGeometri:
         self.r2 = self.r1 * math.exp(self.theta * math.tan(self.ro))
 
         #TODO: Implemptere justering for botn fundament, berre legge til z?
-        self.r1_z = -abs(self.r1*math.sin(self.beta2)) - self.z_avsett
+        self.r1_z = -abs(self.r1*math.sin(self.beta2))
         self.r1_x = -abs(self.r1*math.cos(self.beta2))
-        self.r2_z = -abs(self.r2*math.sin(self.beta4)) - self.z_avsett
+        self.r2_z = -abs(self.r2*math.sin(self.beta4))
         self.r2_x = abs(self.r2*math.cos(self.beta4))
 
 
