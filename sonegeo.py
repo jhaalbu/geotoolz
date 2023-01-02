@@ -15,6 +15,7 @@ class SoneGeometri:
         self.x_avsett_fund = x_avsett_fund
         self.bunn_fundament_z = fundament.bunn_fundament
         self.rb = fundament.rb
+        self.z_avsett = fundament.z
 
         self.ro = math.radians(self.phi_lag1) / self.gamma_m
         self.tan_omega = ((1-(math.sqrt(1-self.rb**2)))/self.rb)*((math.tan(math.radians(45 + (math.degrees(self.ro)/2)))))
@@ -29,9 +30,9 @@ class SoneGeometri:
         self.r2 = self.r1 * math.exp(self.theta * math.tan(self.ro))
 
         #TODO: Implemptere justering for botn fundament, berre legge til z?
-        self.r1_z = -abs(self.r1*math.sin(self.beta2))
+        self.r1_z = -abs(self.r1*math.sin(self.beta2)) - self.z_avsett
         self.r1_x = -abs(self.r1*math.cos(self.beta2))
-        self.r2_z = -abs(self.r2*math.sin(self.beta4))
+        self.r2_z = -abs(self.r2*math.sin(self.beta4)) - self.z_avsett
         self.r2_x = abs(self.r2*math.cos(self.beta4))
 
 
