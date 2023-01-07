@@ -4,10 +4,11 @@ import matplotlib.ticker as ticker
 import numpy as np
 import geofunk
 import math
+import grunn
 
 
 def plot_nfakt(tan_ro, r, nq, ngamma):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=[8, 8])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=[6, 6])
     r_liste = [x / 100 for x in range(0, 100, 10)]
     tan_fi_d = [x / 100 for x in range(10, 100, 1)]
     ax1.scatter(tan_ro, nq, color="red")
@@ -53,22 +54,23 @@ def plot_nfakt(tan_ro, r, nq, ngamma):
     ax1.text(
         0.01,
         0.99,
-        f"tan(ro)={tan_ro}\nr={r}\nNq={round(nq,1)}",
+        f"tan \u03C1={tan_ro}\nr={round(r,1)}\nN$_{{{'q'}}}$={round(nq,1)}",
         ha="left",
         va="top",
         transform=ax1.transAxes,
     )
+    gamma = "\u03B3"
     ax2.text(
         0.01,
         0.99,
-        f"tan(ro)={tan_ro}\nr={r}\nN\u03B3={round(ngamma,1)}",
+        f"tan \u03C1={tan_ro}\nr={round(r,1)}\nN$_{{{gamma}}}$={round(ngamma,1)}",
         ha="left",
         va="top",
         transform=ax2.transAxes,
     )
-    ax1.set(xlabel="tan(ro)", ylabel="Nq")
-    ax2.set(xlabel="tan(ro)", ylabel="N\u03B3")
-
+    ax1.set(xlabel="tan \u03C1", ylabel="N$_{q}$")
+    ax2.set(xlabel="tan \u03C1", ylabel="N$_{\u03B3}$")
+    fig.tight_layout()
     return fig
 
 
@@ -205,3 +207,45 @@ def tegn_fundament_terreng(fundament, helling, terrenghoyde=0, ax1=None):
     z_punkter.append(bunn_terreng_z)
     ax1.plot(x_punkter, z_punkter)
     return ax1
+
+def plot_samla(fundament, jordprofil):
+    fig, ax1 = plt.subplots(figsize=[8,8])
+    sonegeo = SoneGeometri(fundament,jordprofil)
+    ax1 = fundament.tegn_fundament()
+    ax1 = sonegeo.tegn_sonegeometri()
+    ax1 = tegn_fundament_terreng(fundament, 0.33)
+    ax1.set_aspect('equal')
+    ax1.set_ylim(-abs(sonegeo.r2_z +sonegeo.r2_z*0.5), abs(sonegeo.r1_z)*0.7)
+    ax1.set_xlabel('Lengde langs snitt (m)')
+    ax1.set_ylabel('Dybde (m)')
+    return fig
+
+def finn_solebredde(z, fv_fund, fh, gamma_m, helling_forhold, jordprofil, plot):
+    fundamenter = []
+    qv = []
+    sigma = []
+    saalebredde = np.arange(0.5, 5.0, 0.1)
+    for i in saalebredde:
+        fund = grunn.Fundament(i, z, fv_fund, fh, gamma_m, jordprofil)
+        fund.sett_delta_fv()
+        fund.sigma_v(helling_forhold)
+        fundamenter.append(fund)
+        qv.append(fund.qv)
+        sigma.append(fund.sigma_v_)
+    qv_arr = np.array(qv)
+    sigma_arr = np.array(sigma)
+    idx = np.argwhere(np.diff(np.sign(qv_arr - sigma_arr))).flatten()
+    b0_min = round(saalebredde[idx[0]],1)
+    if plot:
+        fig, ax1 = plt.subplots(figsize=[8,4])
+        ax1.plot(saalebredde, qv, label='q$_{v}$')
+        ax1.plot(saalebredde, sigma, label='\u03C3$_{v}$')
+        ax1.plot(saalebredde[idx[0]], qv[idx[0]], 'ro')
+        ax1.set_xlabel('Sålebredde (m)')
+        ax1.set_ylabel('Spenning (kPa)')
+        ax1.grid()
+        ax1.legend()
+        ax1.annotate(f'B$_{{{0}}} = {b0_min}$m', xy=(saalebredde[idx[0]], qv[idx[0]]), xycoords='data', xytext=(saalebredde[idx[0]]*1.1, qv[idx[0]]*1.5), arrowprops=dict(arrowstyle="->"))
+        return b0_min, fig
+    else: 
+        return b0_min

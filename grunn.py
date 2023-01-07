@@ -292,7 +292,6 @@ class Fundament(object):
         return self.rb
 
     def nq_ngamma_faktor(self):
-        print(self.tan_fi_d, self.rb)
         self.nq, self.n_gamma = geofunk.n_fakt(self.tan_fi_d, self.rb)
         return self.nq, self.n_gamma
 
@@ -305,7 +304,10 @@ class Fundament(object):
 
     # TODO: Må finne gamma under fundament, ta inn geolag for å gjere dette?? Rekne ut på nytt, og for neste lag dersom sonegeometri går ned i lag?
 
-    def sigma_v(self):
+    def sigma_v(self, helling_forhold):
+        self.sett_rb()
+        self.nq_ngamma_faktor()
+        self.reduksjonsfaktor_v220(helling_forhold)
         self.p_merka = self.gamma * self.z
         self.sigma_v_ = (
             self.fsq
