@@ -22,12 +22,14 @@ def jordtrykksfaktor_ka(friksjonsvinkel, beta=0, r=0):
     '''
     Berekner aktiv jordstrykksfaktor
     
-    Parameter:
+    Parameters:
+    ----------
         friksjonsvikel: friksjonsvinkel, bør kunne støtte både tangens til friksjonsvnikel og grader
         beta: helling bak skråning
         r: ruhet? TODO: Må sjekkes!
         
-    Retur:
+    Returns:
+    -------
         Jordtrykksfaktor
     '''
     if friksjonsvinkel > 1:
@@ -69,7 +71,7 @@ def rb(Fh, B0, qv, a, tan_ro):
 
 
     Retur:
-        Bæreevnefaktorer
+        Fundamentruhet
     '''
     rb = (Fh/B0) / ((qv + a) * tan_ro)
     return rb
@@ -126,6 +128,9 @@ def n_fakt(tan_ro, ruhet, helling=10000):
     N_gamma = min(n_gamma_list)
         
     return Nq, N_gamma    
+
+def nc_fakt(omega, f_omega):
+    return (math.pi - 2*omega) + (2/(1+f_omega**2))
 
 def reduksjonsfaktor_beta(helling_forhold):
     if helling_forhold == 0:
@@ -191,9 +196,11 @@ def qv_dict(jordlag, b0_min, b0_maks, fv, **kwargs):
     for i in range(int(b0_min*100), int(b0_maks*100)):
         qv_dict[i/100] = qv(i/100, fv+fv_delta(jordlag.gamma))
 
+def omega(r):
+    return 0.5 * math.asin(r)
 
 def delta_fv(gamma, z, u, b0):
-    return gamma*z*b0
+    return (gamma*z*b0)
 
 def stråle_r1(b0, beta1, beta3):
     return b0 * (math.sin(beta1))/(math.sin(beta3))
