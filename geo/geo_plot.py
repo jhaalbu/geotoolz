@@ -232,7 +232,7 @@ def finn_solebredde(z, fv_fund, fh, gamma_m, terrenghelling, jordprofil, plot):
     
     sigma = []
     
-    saalebredde = np.arange(0.1, 20, 0.1)
+    saalebredde = np.arange(0.01, 20, 0.01)
     for i in saalebredde:
         fund = grunn.Fundament(i, z, fv_fund, fh, gamma_m, jordprofil)
         fund.sett_delta_fv()

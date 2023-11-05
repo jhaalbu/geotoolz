@@ -35,7 +35,7 @@ with col1:
     with col4:
         st.write(f"tan φ: {round(tan_phi_value,2)}")
     gamma = st.number_input("Gamma", value=18, min_value=0, max_value=30, step=1)
-    gamma_m = st.number_input("Gamma_m", value=1.4, min_value=1.0, max_value=2.0, step=0.1)
+    gamma_m = st.number_input("Gamma_m", value=1.4, min_value=1.0, max_value=2.0, step=0.05)
     attraksjon = st.number_input("Attraksjon", value=2, min_value=0, max_value=1000, step=1)
     terrenghelling = st.number_input("Terrenghelling", value=0.0, min_value=0.0, max_value=2.0, step=0.01)
     #grunnvannstand = st.number_input("Grunnvannstand", value=0.0, min_value=0.0, max_value=10.0, step=0.1)
