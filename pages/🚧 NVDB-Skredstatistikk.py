@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import nvdbapiv3
 import altair as alt
-import geopandas as gpd
 from shapely import wkt
 import folium
 from folium.plugins import Draw
@@ -19,13 +18,7 @@ st.set_page_config(page_title='NVDB skreddata', page_icon=None, layout="centered
 def feilmelding():
     st.write('Feil oppstått, mest truleg feil vegreferanse. Prøv igjen med ny vegreferanse.')
 
-def last_ned_shape(df, type='linje'):
-    st.write(df)
-    df['Skred_dato'] = df['Skred_dato'].astype(str)
-    df['geometri'] = df['geometri'].apply(wkt.loads)
-    gdf = gpd.GeoDataFrame(df, geometry='geometri')
-    gdf.crs = "EPSG:32633"
-    return gdf
+
 
 @st.cache_data
 def databehandling(filter):

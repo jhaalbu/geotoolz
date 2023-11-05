@@ -17,7 +17,7 @@ col1, col2 = st.columns([1, 3])
 
 with col1:
 # Radio button for input selection
-    format_option = st.radio("Velg grader, eller forholdstall:", ('φ (grader)', 'tan φ'))
+    format_option = st.radio("Karakteristisk friksjonsvinkel. Velg grader, eller forholdstall:", ('φ (grader)', 'tan φ'))
 
     # Input for φ (degrees)
     if format_option == 'φ (grader)':
@@ -34,10 +34,11 @@ with col1:
         st.write(f"φ (grader): {round(phi_value,1)}")
     with col4:
         st.write(f"tan φ: {round(tan_phi_value,2)}")
-    gamma = st.number_input("Gamma", value=18, min_value=0, max_value=30, step=1)
     gamma_m = st.number_input("Gamma_m", value=1.4, min_value=1.0, max_value=2.0, step=0.05)
-    attraksjon = st.number_input("Attraksjon", value=2, min_value=0, max_value=1000, step=1)
-    terrenghelling = st.number_input("Terrenghelling", value=0.0, min_value=0.0, max_value=2.0, step=0.01)
+    gamma = st.number_input("Tyngdetetthet (kN/m3)", value=18, min_value=0, max_value=30, step=1)
+    
+    attraksjon = st.number_input("Attraksjon (kPa)", value=2, min_value=0, max_value=1000, step=1)
+    terrenghelling = st.number_input("Terrenghelling (forholdstall)", value=0.0, min_value=0.0, max_value=2.0, step=0.01)
     #grunnvannstand = st.number_input("Grunnvannstand", value=0.0, min_value=0.0, max_value=10.0, step=0.1)
     #tan_phi = st.number_input("Tan phi", value=0.7)
     #attraksjon = st.number_input("Attraksjon", value=10)
@@ -49,21 +50,17 @@ with col1:
     tan_fi_d = round(tan_phi_value/gamma_m,2)
 
     #vertikalkrefter
-    fv_fund = st.number_input("Sum vertikalkraft", value=360, min_value=0, step=1)
+    fv_fund = st.number_input("Sum vertikalkraft (kN/m)", value=360, min_value=0, step=1)
     #Horisontalkrefter
-    fh = st.number_input("Sum horisontalkraft", value=120, min_value=0, step=1)
+    fh = st.number_input("Sum horisontalkraft (kN/m)", value=50, min_value=0, step=1)
 
     #Dybde til underkant fundament
-    z = st.number_input("Dybde til underkant fundament", value=0.5, min_value=0.0, step=0.1)
+    z = st.number_input("Dybde til underkant fundament (m)", value=0.5, min_value=0.0, step=0.1)
 with col2:
     try:
         jordlag = grunn.JordLag('grus', 10000, gamma)
         jordlag.sett_styrke_parameter(tanphi=tan_fi_d, attraksjon=attraksjon)
         jordprofil = grunn.JordProfil([jordlag], z)
-
-
-
-
 
         b0, fig = geo_plot.finn_solebredde(z, fv_fund, fh, gamma_m, terrenghelling, jordprofil, plot=True)
         st.write(b0)
