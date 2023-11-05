@@ -199,4 +199,4 @@ st.write(
 )
 st.markdown(link, unsafe_allow_html=True)
 st.write("Utvikla av Asplan Viak, v/Jan Helge Aalbu")
-st.write("Ved spørsmål eller feil ta kontakt på jan.aalbu@asplanviak.no")
+
