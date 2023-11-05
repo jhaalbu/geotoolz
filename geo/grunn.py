@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import geofunk
+import geo.geofunk as geofunk
 
 
 class JordLag(object):
@@ -34,7 +34,7 @@ class JordLag(object):
         self.df["gamma"] = self.gamma / 100
 
     def __str__(self) -> str:
-        return f"Jordart: {self.lagnavn}, Mektighet: {self.mektighet_cm}"
+        return f"{self.lagnavn}, Mektighet: {self.mektighet_cm}"
 
     def sett_styrke_parameter(
         self, phi_grader=0, tanphi=0, attraksjon=0, kohesjon=0, cu=0
@@ -65,6 +65,7 @@ class JordLag(object):
         if self.tanphi == 0:
             self.tanphi = round(math.tan(math.radians(self.phi_grader)), 2)
         # self.phi_grader = phi_grader
+        print(f'phi_grader: {self.phi_grader}, tanphi: {self.tanphi}')
         self.attraksjon = attraksjon
         self.kohesjon = kohesjon
         self.cu = cu
@@ -299,19 +300,24 @@ class Fundament(object):
         self.nc = geofunk.nc_fakt(self.tan_fi_d, self.rb)
         return self.nc
 
-    def reduksjonsfaktor_v220(self, helling_forhold):
-        self.helling_forhold = helling_forhold
-        # self.fsa, self.fsq = geofunk.reduksjonsfaktor_v220(self.helling_forhold, self.tan_fi_d)
-        self.fsa = 0.73
-        self.fsq = 0.36
+    def reduksjonsfaktor_v220(self, terrenghelling):
+        self.fsq = (1-(0.55*terrenghelling))**5
+        self.fsa = math.e**(-2*math.tan(terrenghelling)*self.tan_fi_d)
         return self.fsa, self.fsq
+
+    # def reduksjonsfaktor_v220(self, terrenghelling):
+    #     self.terrenghelling = terrenghelling
+    #     # self.fsa, self.fsq = geofunk.reduksjonsfaktor_v220(self.helling_forhold, self.tan_fi_d)
+    #     self.fsa = 0.73
+    #     self.fsq = 0.36
+    #     return self.fsa, self.fsq
 
     #TODO: Må finne gamma under fundament, ta inn geolag for å gjere dette?? Rekne ut på nytt, og for neste lag dersom sonegeometri går ned i lag?
 
-    def sigma_v(self, helling_forhold):
+    def sigma_v(self, terrenghelling):
         self.sett_rb()
         self.nq_ngamma_faktor()
-        self.reduksjonsfaktor_v220(helling_forhold)
+        self.reduksjonsfaktor_v220(terrenghelling)
         self.p_merka = self.gamma * self.z
         self.sigma_v_ = (
             self.fsq
@@ -327,6 +333,12 @@ class Fundament(object):
         Tegner opp fundament
         """
 
+        dx = self.rb  # Since rb varies between 0 and 1, it can represent the horizontal component directly
+        dy = -np.sqrt(1 - self.rb**2)  # The vertical component based on Pythagorean theorem
+        arrow_length = self.b0
+        arrow_start = (self.x_avsett_fund-(self.b0/2)-(dx*self.b0), (self.bunn_fundament+self.fundament_tykkelse*2)+abs(dy)*arrow_length*1.05)
+
+
         b0_negativ = -abs(self.b)
         if ax1 is None:
             ax1 = plt.gca()
@@ -340,4 +352,7 @@ class Fundament(object):
                 self.bunn_fundament + self.fundament_tykkelse,
             ],
         )
+        ax1.arrow(arrow_start[0], arrow_start[1], dx * arrow_length, dy * arrow_length, head_width=arrow_length*0.05, head_length=arrow_length*0.1, fc='blue', ec='blue')
+        ax1.set_aspect('equal')
+
         return ax1

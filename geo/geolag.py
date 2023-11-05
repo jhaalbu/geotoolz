@@ -9,7 +9,7 @@ import math
 from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np 
-import geofunk
+import geo.geofunk
 
 class GeoLag(object):
     def __init__(self, jordart, ztopp, zbunn, gamma=18):
