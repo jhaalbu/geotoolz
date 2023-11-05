@@ -11,5 +11,5 @@ pyextremes
 pyproj
 requests
 windrose
-nvdbapiv3
+nvdbapi-v3
 pyproj
