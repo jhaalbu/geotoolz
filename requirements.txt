@@ -1,4 +1,13 @@
 numpy
 pandas
+streamlit
 matplotlib
 scipy
+streamlit_folium
+folium
+numba
+numdifftools
+pyextremes
+pyproj
+requests
+windrose
