@@ -13,3 +13,6 @@ requests
 windrose
 nvdbapi-v3
 pyproj
+shapely
+altair
+geopandas
