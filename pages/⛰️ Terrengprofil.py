@@ -19,12 +19,25 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
+import matplotlib.ticker as ticker
 import matplotlib.image as image
+from shapely.geometry import LineString
+from pyproj import CRS
+from pyproj import Transformer
+import folium
+import math
+from shapely.geometry import MultiPoint, Point
+from streamlit_folium import st_folium
 
 #TODO: Vise kart
 #TODO: La bruker tegne på kart
 
 st.set_page_config(layout="wide")
+
+def transformer(x, y):
+    transformer = Transformer.from_crs(5973, 4326)
+    trans_x, trans_y =  transformer.transform(x, y)
+    return trans_x, trans_y
 
 #Laster inn Asplan Viak logo for vannmerke i plot, usikker på valg av logostørrelse..
 # with open('logo (Phone).png', 'rb') as file:
@@ -197,6 +210,103 @@ def terrengprofil(df, utjamning=False, opplosning=None):
 
     return df
 
+def alfabeta(df_heile, losne):
+    df = df_heile.iloc[losne:]
+    df = df.reset_index(drop=True)
+    df['M'] = range(0, len(df))
+    p = np.poly1d(np.polyfit(df['M'], df['Z'], 5))
+    df['tilpass'] = p(df['M'])
+    z_tilpass = df['tilpass'].tolist()
+    z = df['Z'].tolist()
+    m = df['M'].tolist()
+    h_tilpass = []
+    for i in range(len(m)):
+        h_tilpass.append((z_tilpass[i] - z_tilpass[i -1])/(m[i] - m[i - 1]))  
+#Rekner ut hellinger, litt uelegant utanfor pandas, men funker..
+    df['H_tilpass'] = h_tilpass
+    df['deg_tilpass'] = np.degrees(df['H_tilpass'])
+    df10 = df.loc[(df['deg_tilpass'] <= -9.8) & (df['deg_tilpass'] >= -10.2)]
+    #Finner enkelpunktet på 10 grader
+    value = -10 #Verdien som skal finnest
+    mpos_10grad = abs(df['deg_tilpass'] - value).idxmin() #X-akse verdien, altså meterverdi langs skredbane
+    #mpos_10grad = 1044
+    zpos_10grad = df.loc[mpos_10grad, 'tilpass'] #Y-akse verdien, altså Z verdi (høgde) for 10 graders punkt
+    maxzpos = df['Z'].max() #Finner største Z verdi, høgast i skredbane
+    pos_topp = (0, df['tilpass'].max()) #Finner posisjonen til toppen av skredbane
+    pos_10grad = (mpos_10grad, zpos_10grad) #Finner posisjonen til 10 graderspunkt
+    m1 = pos_topp[0] 
+    z1 = pos_topp[1]
+
+    m2 = pos_10grad[0]
+    z2 = pos_10grad[1]
+
+    z = z2 - z1
+    m = m2 - m1
+
+    #Finner betavinkel
+    beta = math.atan(z/m)
+    beta_deg = math.degrees(beta)
+    #Rekner ut alphavinkel
+    alpha = -abs((0.96 * abs(beta_deg)) -1.4)
+    alpha_rad = math.radians(alpha)
+    print(f'alpha {alpha} beta {beta_deg}')
+    #alpha_1sd = (0.96 * beta_deg) - 
+
+    m_max = df['M'].max()
+    temp_z = math.tan(alpha_rad) * m_max
+    pos_max = (m_max, z1 - -temp_z)
+
+    #Bruker Shapelybibliotek for å finne 
+    first_line = LineString(np.column_stack((df['M'], df['tilpass'])))
+    second_line = LineString(np.column_stack(([pos_topp[0], pos_max[0]], [pos_topp[1], pos_max[1]])))
+    intersection = first_line.intersection(second_line)
+    print(intersection)
+
+    koordliste = [(p.x, p.y) for p in intersection.geoms]
+
+    #koordliste = [(p.x, p.y) for p in intersection]
+    print(koordliste)
+    utlop = koordliste[-1]
+
+    textstr = '\n'.join((
+        r'$\alpha=%.f$' % (abs(round(alpha,1)), ),
+        r'$\beta=%.f$' % (abs(round(beta_deg,1)), ),))
+
+    fig, ax = plt.subplots(figsize=(15,10))
+    ax.plot(df['M'], df['Z']) #Høgdeprofilet
+    ax.scatter(df10['M'], df10['Z'], color='r', linewidth=1, label='Punkt med 10 grader helling') # 10 graders punkter
+    ax.plot([pos_topp[0], pos_10grad[0]], [pos_topp[1], pos_10grad[1]], color='orange') #Beta 
+    #ax.plot([pos_topp[0], pos_max[0]], [pos_topp[1], pos_max[1]])
+    if isinstance(intersection, MultiPoint) or isinstance(intersection, Point):
+        for p in koordliste:
+            ax.plot([pos_topp[0], p[0]], [pos_topp[1], p[1]], color='red')
+    elif isinstance(intersection, LineString):
+        ax.plot(*intersection.xy, color='red')
+    else:
+        print(f"Unhandled geometry type: {type(intersection)}")
+    ax.plot(df['M'], df['tilpass']) #Plotter regresjonslinje ax2 + bx + c
+    ax.legend()
+    ax.grid()
+    loc = ticker.MultipleLocator(base=100.0)
+    ax.xaxis.set_major_locator(loc)
+    ax.yaxis.set_major_locator(loc)
+    ax.axis('equal')
+    ax.annotate("10 graders punkt", xy=(m2, z2),  xycoords='data',
+                xytext=(-70, -30), textcoords='offset points',
+                arrowprops=dict(arrowstyle="->",
+                                connectionstyle="arc3,rad=-0.2"))
+    ax.annotate("Utløpslengde "+str(int(utlop[0]))+'m', xy=utlop,  xycoords='data',
+                xytext=(70, -30), textcoords='offset points',
+                arrowprops=dict(arrowstyle="->",
+                                connectionstyle="arc3,rad=-0.2"))
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+
+    return fig
+    
 def csv_bearbeiding(fil):
     '''Fikser fil med høydatada.no som levere både DTM og DOM'''
     df = pd.read_csv(uploaded_file, sep=';', skiprows=1)
@@ -268,5 +378,10 @@ if uploaded_file is not None:
 
         
     fargeplot(df_plot, rutenettx, rutenetty, farge, aspect, tiltak, tiltak_plassering, femtenlinje, linjeverdi, meterverdi, retning, justering, tegnforklaring)
-
+    
+    if farge == 'Snøskred':
+        losne = st.number_input("Gi plassering for løsneområde", value=0, min_value=0, step=10)
+        if st.button('Vis alfabeta'):
+            fig = alfabeta(df, losne)
+            st.pyplot(fig)
 

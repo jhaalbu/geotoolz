@@ -203,10 +203,10 @@ def tegn_fundament_terreng(fundament, helling, terrenghoyde=0, ax1=None):
     slutt_terreng_x = abs(
         (fundament.x_avsett_fund + 4 * fundament.b)
     )  # bunn av bakke dersom helling
-    bunn_terreng_z = -abs(-abs((fundament.x_avsett_fund + 5 * fundament.b) * helling))
+    bunn_terreng_z = -abs(-abs((fundament.x_avsett_fund - (fundament.b0/2) + 5 * fundament.b) * helling))
     x_punkter.append(start_terreng_x)
     x_punkter.append(fundamentpunkt_x_mot_helling)
-    x_punkter.append(slutt_terreng_x)
+    x_punkter.append(slutt_terreng_x + (fundament.b0/2))
     z_punkter.append(bunn_terreng_z)
     ax1.plot(x_punkter, z_punkter)
     ax1.set_aspect('equal')
