@@ -65,7 +65,7 @@ class JordLag(object):
         if self.tanphi == 0:
             self.tanphi = round(math.tan(math.radians(self.phi_grader)), 2)
         # self.phi_grader = phi_grader
-        print(f'phi_grader: {self.phi_grader}, tanphi: {self.tanphi}')
+        #print(f'phi_grader: {self.phi_grader}, tanphi: {self.tanphi}')
         self.attraksjon = attraksjon
         self.kohesjon = kohesjon
         self.cu = cu

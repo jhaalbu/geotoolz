@@ -241,13 +241,13 @@ def finn_solebredde(z, fv_fund, fh, gamma_m, terrenghelling, jordprofil, plot):
         qv.append(fund.qv)
         sigma.append(fund.sigma_v_)
     
-    print(f'qv={qv}')
+    #print(f'qv={qv}')
     #print(f'fundamenter={fundamenter}')
-    print(f'sigma={sigma}')    
+    #print(f'sigma={sigma}')    
     qv_arr = np.array(qv)
     sigma_arr = np.array(sigma)
     idx = np.argwhere(np.diff(np.sign(qv_arr - sigma_arr))).flatten()
-    print(f'idx={idx}')
+    #print(f'idx={idx}')
     qv_norm = round(qv[idx[0]], 0)
     b0_min = round(saalebredde[idx[0]],1)
     if plot:

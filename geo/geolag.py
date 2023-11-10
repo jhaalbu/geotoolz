@@ -19,7 +19,7 @@ class GeoLag(object):
         self.zbunn = zbunn #cm
         self.gamma = gamma
         self.mektighet = zbunn - ztopp #cm
-        print(self.mektighet)
+        #print(self.mektighet)
         self.gamma_m = 1
 
     def __repr__(self):
@@ -116,8 +116,8 @@ class geoLagPakke(object):
         self.lagdf['Pv'] = 0
         self.lagdf['Gamma'] = 0
         for lag in self.lagliste:
-            print(lag)
-            print(lag.gamma)
+            #print(lag)
+            #print(lag.gamma)
             self.lagdf['Gamma'].loc[((self.lagdf['Djupne'] >= lag.ztopp) & (self.lagdf['Djupne'] <= lag.zbunn))] = lag.gamma
         self.lagdf['Vekt'] = self.lagdf['Gamma'] * 0.01
         self.lagdf['Pv'] = self.lagdf.Vekt.cumsum()
@@ -149,14 +149,14 @@ class geoLagPakke(object):
         return 'Ka utført'
 
     def k0(self, beta=0, r=0):
-        print(self.lagdf)
+        #print(self.lagdf)
         self.lagdf['K0'] = 0
-        print(self.lagdf)
+        #print(self.lagdf)
         for lag in self.lagliste:
             self.lagdf['K0'].loc[((self.lagdf['Djupne'] >= lag.ztopp) & (self.lagdf['Djupne'] <= lag.zbunn))] = lag.k0
         #print(len(self.k0_spenning))
         self.lagdf["Ph' (K0)"] = self.lagdf["Pv'"] * self.lagdf['K0']
-        print(self.lagdf)
+        #print(self.lagdf)
         return 'K0 utført'
         
     def spennings_plott(self):

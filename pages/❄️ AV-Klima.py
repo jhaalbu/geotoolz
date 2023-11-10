@@ -77,7 +77,7 @@ lokalitet = st.text_input("Gi navn til lokalitet (brukes i tittel på plot)", na
 # Hardkoda start og sluttdato, det er mulig å utvide dette til å la bruker velge, 
 # men funksjoner for plotting er ikke utvikla for å håndtere dette
 startdato = "1958-01-01"
-sluttdato = "2022-12-31"
+sluttdato = "2023-10-31"
 
 #Lar brukere velge plotversjoner
 plottype = st.radio(
@@ -156,7 +156,7 @@ if knapp:
             "fsw",
             "rrl",
         ]
-        vindslutt = "2022-03-01"
+        vindslutt = "2023-03-01"
         vindstart = "2018-03-01"
         vind_df = klimadata.klima_dataframe(x, y, vindstart, vindslutt, vind_para)
         st.pyplot(plot.vind(vind_df))
