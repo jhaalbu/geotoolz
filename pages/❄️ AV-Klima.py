@@ -11,10 +11,11 @@ import folium
 from streamlit_folium import st_folium, folium_static
 import pydeck as pdk
 import matplotlib.pyplot as plt
+from folium.plugins import Draw
 
 st.set_page_config(page_title="AV-Klima", page_icon=":snowflake:")
 
-st.title("AV-Klima")
+st.title("AV-Klima !OBS testversjon!")
 st.write("Enkel webapp for klimaanalyser basert på grid klimadata.")
 
 # Setter liste med parametere brukt i analyse, tenkt å kunne utvides
@@ -36,10 +37,24 @@ folium.raster_layers.WmsTileLayer(
     overlay=True,
     control=True,
 ).add_to(m)
+Draw(
+        export=False,
+        position="topleft",
+        draw_options={
+            "polyline": False,
+            "poly": False,
+            "circle": False,
+            "polygon": False,
+            "marker": True,
+            "circlemarker": False,
+            "rectangle": False,
+        },
+    ).add_to(m)
 
 # Litt knotete måte å hente ut koordinater fra Streamlit, kanskje bedre i nye versjoner av streamlit? Ev. litt bedre måte i rein javascript?
 m.add_child(folium.ClickForMarker(popup="Waypoint"))
 output = st_folium(m, width=700, height=500)
+st.write(output)
 #output = folium_static(m, width=700, height=500)
 
 x = 0
