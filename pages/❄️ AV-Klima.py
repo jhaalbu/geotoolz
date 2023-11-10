@@ -8,7 +8,7 @@ from pyproj import Transformer
 from klimadata import klimadata
 from klimadata import plot
 import folium
-from streamlit_folium import st_folium
+from streamlit_folium import st_folium, folium_static
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="AV-Klima", page_icon=":snowflake:")
@@ -39,6 +39,7 @@ folium.raster_layers.WmsTileLayer(
 # Litt knotete måte å hente ut koordinater fra Streamlit, kanskje bedre i nye versjoner av streamlit? Ev. litt bedre måte i rein javascript?
 m.add_child(folium.ClickForMarker(popup="Waypoint"))
 output = st_folium(m, width=700, height=500)
+output = folium_static(m, width=700, height=500)
 
 x = 0
 y = 0
