@@ -25,16 +25,16 @@ transformer = Transformer.from_crs(4326, 5973)
 # Setter opp kartobjekt, med midtpunkt og zoom nivå
 m = folium.Map(location=[62.14497, 9.404296], zoom_start=5)
 #Legger til norgeskart som bakgrunn
-folium.raster_layers.WmsTileLayer(
-    url="https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
-    name="Norgeskart",
-    fmt="image/png",
-    layers="topo4",
-    attr='<a href="http://www.kartverket.no/">Kartverket</a>',
-    transparent=True,
-    overlay=True,
-    control=True,
-).add_to(m)
+# folium.raster_layers.WmsTileLayer(
+#     url="https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
+#     name="Norgeskart",
+#     fmt="image/png",
+#     layers="topo4",
+#     attr='<a href="http://www.kartverket.no/">Kartverket</a>',
+#     transparent=True,
+#     overlay=True,
+#     control=True,
+# ).add_to(m)
 
 # Litt knotete måte å hente ut koordinater fra Streamlit, kanskje bedre i nye versjoner av streamlit? Ev. litt bedre måte i rein javascript?
 m.add_child(folium.ClickForMarker(popup="Waypoint"))
