@@ -3,7 +3,7 @@ pandas
 streamlit
 matplotlib
 scipy
-streamlit_folium=0.14.0
+streamlit_folium==0.15.0
 folium
 numba
 numdifftools
