@@ -37,19 +37,7 @@ folium.raster_layers.WmsTileLayer(
     overlay=True,
     control=True,
 ).add_to(m)
-Draw(
-        export=False,
-        position="topleft",
-        draw_options={
-            "polyline": False,
-            "poly": False,
-            "circle": False,
-            "polygon": False,
-            "marker": True,
-            "circlemarker": False,
-            "rectangle": False,
-        },
-    ).add_to(m)
+
 
 # Litt knotete måte å hente ut koordinater fra Streamlit, kanskje bedre i nye versjoner av streamlit? Ev. litt bedre måte i rein javascript?
 m.add_child(folium.ClickForMarker(popup="Waypoint"))
