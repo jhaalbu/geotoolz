@@ -15,7 +15,7 @@ from folium.plugins import Draw
 
 st.set_page_config(page_title="AV-Klima", page_icon=":snowflake:")
 
-st.title("AV-Klima !OBS testversjon!")
+st.title("AV-Klima")
 st.write("Enkel webapp for klimaanalyser basert på grid klimadata.")
 
 # Setter liste med parametere brukt i analyse, tenkt å kunne utvides
