@@ -6,7 +6,7 @@ import numpy as np
 st.title("Utrekning av flaktykkelse for flakskred")
 
 st.write('Basert på metode fra Sveits, ved Salm et al (1990)')
-st.write('Sjå også NVE sin skredfareveileder angåande brotkanthøgde')
+st.write('Sjå også NVE sin skredfareveileder angåande flaktykkelse')
 st.markdown("[NVE Veileder](https://veileder-skredfareutredning-bratt-terreng.nve.no/hvordan-utfore-en-skredfareutredning/fase-2-utfore-oppdrag/prosedyre-snoskred/steg-2-vurdering-av-losneomrader-og-losnesannsynlighet/)")
 
 snøhøgde = st.number_input("3 døgns snøhøgde i cm (for det aktuelle gjenntaksintervall)", min_value=0, max_value=10000, value=150, step=1)
