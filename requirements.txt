@@ -16,3 +16,4 @@ pyproj
 shapely
 altair
 geopandas
+ezdxf
