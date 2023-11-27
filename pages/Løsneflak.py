@@ -18,7 +18,7 @@ def bruddhøgde(snøhøgde, terrengvinkel):
     return vinkeljustering * snøhøgde
 
 
-st.write("Flaktykkelse: ", np.round(bruddhøgde(snøhøgde, terrengivnkel), 2), "cm")
+st.write("Flaktykkelse: ", np.round(bruddhøgde(snøhøgde, terrengivnkel), 0), "cm")
 
 st.divider()
 
