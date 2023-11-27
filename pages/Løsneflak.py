@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-st.title("Utrekning av brotkanthøgde for flakskred")
+st.title("Utrekning av flaktykkelse for flakskred")
 
 st.write('Basert på metode fra Sveits, ved Salm et al (1990)')
 st.write('Sjå også NVE sin skredfareveileder angåande brotkanthøgde')
@@ -18,7 +18,7 @@ def bruddhøgde(snøhøgde, terrengvinkel):
     return vinkeljustering * snøhøgde
 
 
-st.write("Bruddhøgde: ", np.round(bruddhøgde(snøhøgde, terrengivnkel), 2), "cm")
+st.write("Flaktykkelse: ", np.round(bruddhøgde(snøhøgde, terrengivnkel), 2), "cm")
 
 st.divider()
 
