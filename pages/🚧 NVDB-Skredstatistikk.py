@@ -117,7 +117,7 @@ losneomrade = st.multiselect(
     ['Fjell/dalside', 'Vegskjæring'])
 
 
-referansevalg = st.radio('Velg vegreferanseinput', ['Ingen', 'Kart', 'Vegreferanse'], horizontal=True)
+referansevalg = st.radio('Velg vegreferanseinput', ['Landsdekkende', 'Kart', 'Vegreferanse'], horizontal=True)
 
 if referansevalg == 'Kart':
     # Setter opp kartobjekt, med midtpunkt og zoom nivå
@@ -230,7 +230,7 @@ vis_kart = st.checkbox('Vis kart')
 if vis_kart:
     karttype = st.radio('Vis kart med linjer eller punkter', ['Linjer', 'Punkter'])
     st.write('OBS! Punkter gir senterpunkt av linjene') 
-st.write(nvdbfilter)  
+#st.write(nvdbfilter)  
 vis_data = st.button('Hent skreddata')
 
 if vis_data:
