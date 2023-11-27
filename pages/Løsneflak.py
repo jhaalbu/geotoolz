@@ -10,3 +10,6 @@ def bruddhøgde(snøhøgde, terrengvinkel):
     return vinkeljustering * snøhøgde
 
 st.write("Bruddhøgde: ", round(bruddhøgde(snøhøgde, terrengivnkel), 2), "cm")
+
+st.write('Metode referert i NVE sin skredfareveileder: https://veileder-skredfareutredning-bratt-terreng.nve.no/hvordan-utfore-en-skredfareutredning/fase-2-utfore-oppdrag/prosedyre-snoskred/steg-2-vurdering-av-losneomrader-og-losnesannsynlighet/')
+st.write('Referanse: Salm, B., Gubler, H. U., & Burkard, A. (1990). Berechnung von Fliesslawinen: eine Anleitung für Praktiker mit Beispielen. Eidgenössisches Institut für Schnee-und Lawinenforschung, Weissfluhjoch/Davos.')
