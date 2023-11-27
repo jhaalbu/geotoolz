@@ -9,7 +9,7 @@ TODO: Definere bedre funksjoner i egen modul for
 å kunne bruke videre i f.eks GIS programvare
 """
 
-
+import requests
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -25,14 +25,19 @@ from shapely.geometry import LineString
 from pyproj import CRS
 from pyproj import Transformer
 import folium
+from folium.plugins import Draw
 import math
-from shapely.geometry import MultiPoint, Point
+from shapely.geometry import MultiPoint, Point, LineString
 from streamlit_folium import st_folium
+import ezdxf
+from io import BytesIO
+import tempfile
 
 #TODO: Vise kart
 #TODO: La bruker tegne på kart
 
 st.set_page_config(layout="wide")
+
 
 def transformer(x, y):
     transformer = Transformer.from_crs(5973, 4326)
@@ -195,7 +200,9 @@ def terrengprofil(df, utjamning=False, opplosning=None):
     Denne 
     """
     if utjamning == True:
-        df = df.groupby(np.arange(len(df))//opplosning).mean()
+        numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
+        df[numeric_cols] = df[numeric_cols].groupby(np.arange(len(df))//opplosning).mean()
+        #df = df.groupby(np.arange(len(df))//opplosning).mean()
     
     #Rekner ut hellinger, litt uelegant utanfor pandas, men funker..
     z = df['Z'].tolist()
@@ -209,6 +216,9 @@ def terrengprofil(df, utjamning=False, opplosning=None):
     df['Vinkel'] = abs(np.degrees(np.arctan(df['Helning'])))
 
     return df
+
+def profildf():
+    return
 
 def alfabeta(df_heile, losne):
     df = df_heile.iloc[losne:]
@@ -295,7 +305,7 @@ def alfabeta(df_heile, losne):
                 xytext=(-70, -30), textcoords='offset points',
                 arrowprops=dict(arrowstyle="->",
                                 connectionstyle="arc3,rad=-0.2"))
-    ax.annotate("Utløpslengde "+str(int(utlop[0]))+'m', xy=utlop,  xycoords='data',
+    ax.annotate("Utløpslengde "+str(int(utlop[1]))+'m', xy=utlop,  xycoords='data',
                 xytext=(70, -30), textcoords='offset points',
                 arrowprops=dict(arrowstyle="->",
                                 connectionstyle="arc3,rad=-0.2"))
@@ -314,11 +324,76 @@ def csv_bearbeiding(fil):
     df = df.astype('float64')
     return df
 
-st.header('Profilverktøy')
-st.write('Leser csv filer fra profilverktøyet på Høydedata.no')
+def transform_coords(coords):
+    transformer = Transformer.from_crs(4326, 25833)
+    return [transformer.transform(lon, lat) for lat, lon in coords]
 
-#FIXME: Eskalerte etter kvart, legge inn i ein main() funksjon?
-uploaded_file = st.file_uploader("Choose a file")
+def interpolate_points_shapely(coords, distance_m=1):
+    
+    utm_coords = transform_coords(coords)
+    #print(utm_coords)
+    #st.write(coords)
+    #print(utm_coords)
+    line = LineString(utm_coords)
+    st.write(f'Linjelengde: {round(line.length)}')
+    num_points = int(line.length / distance_m)
+
+    points = []
+    for i in range(num_points + 1):
+        point = line.interpolate(distance_m * i)
+        points.append([point.x, point.y])  # Append the x and y coordinates as a list
+
+    return points
+
+def chunk_list(lst, chunk_size):
+    """Yield successive chunks from lst of size chunk_size."""
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
+def calculate_distance(row, prev_row):
+    if prev_row is None:
+        return 0
+    return math.sqrt((row['x'] - prev_row['y']) ** 2 + (row['y'] - prev_row['y']) ** 2)
+
+def create_dxf(df):
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.dxf') as tmpfile:
+        doc = ezdxf.new('R2010')
+        msp = doc.modelspace()
+
+        for index, row in df.iterrows():
+            if index > 0:
+                msp.add_line((df.iloc[index - 1]['M'], df.iloc[index - 1]['Z']), (row['M'], row['Z']))
+
+        # Save DXF to the temporary file
+        doc.saveas(tmpfile.name)
+
+        # Read the file content into a BytesIO object
+        tmpfile.seek(0)
+        buffer = BytesIO(tmpfile.read())
+
+    return buffer
+
+
+@st.cache_data
+def hent_hogder(koordiater, opplosning=1):
+        points = interpolate_points_shapely(koordiater)
+        df = pd.DataFrame()
+        chunk_size = 50
+        for chunk in chunk_list(points, chunk_size):
+            r = requests.get(f'https://ws.geonorge.no/hoydedata/v1/punkt?koordsys=25833&punkter={chunk}&geojson=false')
+            data = r.json()
+
+            temp_df = pd.DataFrame(data['punkter'])
+            df = pd.concat([df, temp_df], ignore_index=True)
+        return df
+
+st.header('Profilverktøy')
+st.write('Henter terrengdata fra kartverket sitt API, eller csv filer fra profilverktøyet på Høydedata.no')
+st.write('Ved bruk av kartverket sitt API blir best tilgjengelige ')
+
+uploaded_file = None
+ok_df = False
 tiltak = False
 tiltak_plassering = 0
 meterverdi = 0
@@ -327,9 +402,81 @@ justering = 0
 femtenlinje = False
 linjeverdi = 1/15
 
-if uploaded_file is not None:
+profilinput = st.radio('Velg input', ('Kart', 'Filopplasting'))
+#FIXME: Eskalerte etter kvart, legge inn i ein main() funksjon?
 
-    df = csv_bearbeiding(uploaded_file)
+if profilinput == 'Filopplasting':
+    uploaded_file = st.file_uploader("Choose a file")
+
+elif profilinput == 'Kart':
+    m = folium.Map(location=[62.14497, 9.404296], zoom_start=5)
+    #Legger til norgeskart som bakgrunn
+    folium.raster_layers.WmsTileLayer(
+        url="https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=topo4&zoom={z}&x={x}&y={y}",
+        name="Norgeskart",
+        fmt="image/png",
+        layers="topo4",
+        attr='<a href="http://www.kartverket.no/">Kartverket</a>',
+        transparent=True,
+        overlay=True,
+        control=True,
+    ).add_to(m)
+    draw = Draw(
+    draw_options={
+        'polyline': {'shapeOptions': {
+                'color': '#0000FF',  # Change this to your desired color
+            }
+        },
+        'polygon': False,
+        'rectangle': False,
+        'circle': False,
+        'circlemarker': False,
+        'marker': False
+    }, position='topleft', filename='skredkart.geojson', export=True,
+    )
+    draw.add_to(m)
+
+    # Litt knotete måte å hente ut koordinater fra Streamlit, kanskje bedre i nye versjoner av streamlit? Ev. litt bedre måte i rein javascript?
+
+    output = st_folium(m, width=900, height=700)
+
+
+    try:
+        koordiater = output["all_drawings"][0]["geometry"]["coordinates"]
+        df = hent_hogder(koordiater)
+
+
+
+
+    # Add a new column for distances
+        df['M'] = df.index
+        df.columns = [col.upper() for col in df.columns]
+
+        # Print or process the DataFrame
+        #st.write(df)
+
+        ok_df = True
+        #r = requests.get('https://ws.geonorge.no/hoydedata/v1/punkt?koordsys=4258&punkter=[[11,60],[12,61]]&geojson=false')
+        #data = r.json()
+        #st.write(data)
+        # try:
+        #     pos1 = output["all_drawings"][0]["geometry"]["coordinates"]
+        #     pos2 = output["all_drawings"][1]["geometry"]["coordinates"]
+        #     st.write(pos1[0])
+        #     st.write(output["all_drawings"][0]["geometry"]["coordinates"])
+        #     st.write(output["all_drawings"][1]["geometry"]["coordinates"])
+        # except:
+        #     st.write('Velg profillinje')
+    except TypeError:
+        st.error('Du må tegne ei profillinje')
+
+else:
+    st.write('Velg input')
+
+if uploaded_file is not None or ok_df is True:
+
+    if uploaded_file:
+        df = csv_bearbeiding(uploaded_file)
     
     farge = st.sidebar.radio(
      "Kva fargar skal vises?",
@@ -385,3 +532,13 @@ if uploaded_file is not None:
             fig = alfabeta(df, losne)
             st.pyplot(fig)
 
+
+
+    if st.button('Lag dxf fil'):
+        dxf_file = create_dxf(df)
+        st.download_button(
+            label="Last ned dxf fil",
+            data=dxf_file,
+            file_name="your_file.dxf",
+            mime="application/dxf"
+        )

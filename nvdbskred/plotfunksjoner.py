@@ -30,16 +30,16 @@ def skred_type_by_month(data_df):
     }
 
     # Create a month column
-    data_df['month'] = data_df['Skred_dato'].dt.strftime('%B')
+    data_df['month'] = data_df.loc[:,'Skred_dato'].dt.strftime('%B')
     
     # Translate month names to Norwegian
-    data_df['month'] = data_df['month'].map(month_mapping)
+    data_df.loc[:, 'month'] = data_df.loc[:,'month'].map(month_mapping)
 
     # Group data by month and type and count occurrences
     data_grouped = data_df.groupby(['month', 'Type_skred']).size().reset_index(name='count')
 
     # Color mapping
-    
+    #
 
     # Create the chart
     chart = alt.Chart(data_grouped).mark_bar().encode(

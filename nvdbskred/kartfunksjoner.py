@@ -6,7 +6,7 @@ from shapely import wkt
 import pandas as pd
 
 def kart(df):
-    df['geometry'] = df['geometri'].apply(wkt.loads)
+    df['geometry'] = df.loc[:,'geometri'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry='geometry')
     gdf.crs = "EPSG:32633"
     gdf_wgs84 = gdf.to_crs("EPSG:4326")
@@ -34,16 +34,18 @@ def kart(df):
 
 def create_point_map(df):
     # Convert 'geometri' column to GeoSeries
-    df['geometry'] = df['geometri'].apply(wkt.loads)
+    df['geometry'] = df.loc[:,'geometri'].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(df, geometry='geometry')
 
     # Set the coordinate system for the GeoDataFrame to UTM 33N
     gdf.crs = "EPSG:32633"
 
+    # Compute midpoints
+    
+ 
     # Transform to WGS 84
     gdf = gdf.to_crs("EPSG:4326")
 
-    # Compute midpoints
     gdf['midtpunkt'] = gdf['geometry'].interpolate(0.5, normalized=True)
 
     # Determine center of the map
