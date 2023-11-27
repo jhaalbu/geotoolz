@@ -266,10 +266,11 @@ if vis_data:
         st.altair_chart(skred_type_counts(filtered_df), use_container_width=True)
         st.altair_chart(skred_type_by_month(filtered_df), use_container_width=True)
 
-        if karttype == 'Punkter':
-            streamlit_folium.folium_static(create_point_map(filtered_df))
-        if karttype == 'Linjer':
-            kart(filtered_df)
+        if vis_kart:
+            if karttype == 'Punkter':
+                streamlit_folium.folium_static(create_point_map(filtered_df))
+            if karttype == 'Linjer':
+                kart(filtered_df)
     except KeyError:
         st.error('Feilmelding! Sjekk om det er motsetningar i filterkriterier, f.eks vegreferanse utanfor fylke, eller kontraktsområde.')
 
