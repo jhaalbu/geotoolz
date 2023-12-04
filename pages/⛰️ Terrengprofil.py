@@ -539,6 +539,6 @@ if uploaded_file is not None or ok_df is True:
         st.download_button(
             label="Last ned dxf fil",
             data=dxf_file,
-            file_name="your_file.dxf",
+            file_name="profil.dxf",
             mime="application/dxf"
         )

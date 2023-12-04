@@ -37,27 +37,41 @@ def skred_type_by_month(data_df):
 
     # Group data by month and type and count occurrences
     data_grouped = data_df.groupby(['month', 'Type_skred']).size().reset_index(name='count')
-
-    # Color mapping
-    #
-
-    # Create the chart
-    chart = alt.Chart(data_grouped).mark_bar().encode(
-        x=alt.X('month:O', title='Måned', axis=alt.Axis(titleFont='Courier', titleFontSize=12, labelColor='white', titleColor='white', gridColor='#555555'), sort=list(month_mapping.values())),  # Use the Norwegian month names for sorting
+    month_totals = data_grouped.groupby('month')['count'].sum().reset_index()
+    # Create the bar chart
+    bar = alt.Chart(data_grouped).mark_bar().encode(
+        x=alt.X('month:O', title='Måned', axis=alt.Axis(titleFont='Courier', titleFontSize=12, labelColor='white', titleColor='white', gridColor='#555555'), sort=list(month_mapping.values())),
         y=alt.Y('count:Q', title='Antall hendelser', axis=alt.Axis(titleFont='Courier', titleFontSize=12, labelColor='white', titleColor='white', gridColor='#555555'), stack=True),
         color=alt.Color('Type_skred:N', legend=alt.Legend(title="Skredtype"), scale=alt.Scale(domain=list(color_map.keys()), range=list(color_map.values()))),
         tooltip=['month', 'Type_skred', 'count']
-    ).properties(
+    )
+
+    # Create the text mark for displaying count
+    text = alt.Chart(month_totals).mark_text(
+        align='center',
+        baseline='bottom',
+        dy=-10,  # Adjust the vertical position of the text
+        color='white'
+    ).encode(
+        x=alt.X('month:O', sort=list(month_mapping.values())),
+        y=alt.Y('count:Q', stack=True),
+        text='count:Q'
+    )
+
+    # Layer the text mark over the bar chart
+    chart = (bar + text).properties(
         title={
-        "text": 'Skredhendelser per måned',
-        "fontSize": 16,
-        "color": 'white',
-        "anchor": 'middle',   # Centers the title
-        "offset": 20          # Adds a bit more space around the title
+            "text": 'Skredhendelser per måned',
+            "fontSize": 16,
+            "color": 'white',
+            "anchor": 'middle',
+            "offset": 20
         },
-        padding={"top": 30} 
+        padding={"top": 30},
+        width=800,
+        height=400
     ).configure(
-        background='#333333'  # Dark background
+        background='#333333'
     ).configure_title(
         fontSize=16,
         font='Courier',
@@ -68,7 +82,6 @@ def skred_type_by_month(data_df):
         titleColor='white',
         labelColor='white'
     )
-
     return chart
 
 def skred_type_counts(data_df):
