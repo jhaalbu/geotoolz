@@ -109,10 +109,15 @@ knapp = st.button('Vis plott')
 
 if knapp:
     df, altitude = klima_dataframe3h(lon, lat, startdato_str, sluttdato_str, parameterliste_3h)
+    df['rr3h_cumsum'] = df['rr3h'].cumsum()
+    max_cum_precip_idx = df['rr3h_cumsum'].idxmax()
+    max_cum_precip_value = round(df['rr3h_cumsum'].max())
+
+    #st.dataframe(df)
     fig = plt.figure(figsize=(15,8)) 
     ax1 = fig.add_subplot(111)
     ax1.set_title('Værdata - 3timer nedbør og temperatur')
-    ax1.bar(df.index,  df['rr3h'], width=0.100)
+    ax1.bar(df.index,  df['rr3h'], width=0.100, label='3t Nedbør')
     ax1.set_xlabel('Tidspunkt')
     ax1.set_ylabel('Nedbør (mm)')
     ax1.xaxis.set_major_locator(mdates.HourLocator(interval=3))   
@@ -123,4 +128,17 @@ if knapp:
     ax2.plot(df.index, df['tm3h'], 'r', label='Temperatur ')
     ax2.set_ylabel('Temperatur (\u00B0C)')
 
+    ax3 = ax1.twinx()
+    ax3.spines["right"].set_position(("axes", 1.05))
+    ax3.plot(df.index, df['rr3h_cumsum'], 'g', label='Kumulert nedbør')
+    ax3.set_ylabel('Kumulert nedbør (mm)')
+    ax3.annotate(f'Max kumulert nedbør: {max_cum_precip_value} mm', 
+             xy=(max_cum_precip_idx, max_cum_precip_value),
+             xytext=(max_cum_precip_idx, max_cum_precip_value + 0.1), # slight offset
+             arrowprops=dict(facecolor='black', shrink=0.05),
+             horizontalalignment='right')
+
+    ax1.legend(loc='upper left')
+    ax2.legend(loc='lower left')
+    ax3.legend(loc='upper right')
     st.pyplot(fig)

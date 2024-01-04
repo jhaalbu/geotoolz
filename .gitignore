@@ -6,3 +6,5 @@ virtual/
 insar-points.csv
 __pycache__
 .gitignore
+Bæreevne_notebook.ipynb
+eksempel_bæreevne.ipynb
