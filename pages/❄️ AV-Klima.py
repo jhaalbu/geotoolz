@@ -93,6 +93,7 @@ plottype = st.radio(
 annotert = st.checkbox("Vis tall på søylediagram og temperaturkurve for månedsnormaler.")
 
 #Lar bruker velge om de vil ha vindanalyse
+st.write("Obs! Feil i winddata grunnlaget.")
 vind = st.checkbox("Kjør vindanalyse")
 
 #Enkel knapp for å vente med kjøre resten av scriptet før input er registert
