@@ -363,8 +363,8 @@ with col_1d:
 with col_2d:
     if undergrunn == 'Berg':
         st.latex(rf'\tau_{{k.mørtel.berg}} = {bergegenskaper[bergart]["Heftfasthet (MPa)"]} MPa')
-        st.latex(rf'\psi = {heftfasthet_berg[heftfasthetstype]['Bruddvinkel']} ^\circ')
-        st.latex(rf'\tau_k = {heftfasthet_berg[heftfasthetstype]['Heftfasthet']} kPa')
+        st.latex(rf'\psi = {heftfasthet_berg[heftfasthetstype]["Bruddvinkel"]} ^\circ')
+        st.latex(rf'\tau_k = {heftfasthet_berg[heftfasthetstype]["Heftfasthet"]} kPa')
         st.latex(rf'\gamma_{{M.berg}} = {gamma_m_berg}')
 
 
