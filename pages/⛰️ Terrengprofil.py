@@ -319,9 +319,12 @@ def alfabeta(df_heile, losne):
     
 def csv_bearbeiding(fil):
     '''Fikser fil med høydatada.no som levere både DTM og DOM'''
-    df = pd.read_csv(uploaded_file, sep=';', skiprows=1)
-    #df = df.loc[: df[(df['X'] == 'Source: DOM1')].index[0] - 1, :]
-    df = df.astype('float64')
+    try:
+        df = pd.read_csv(uploaded_file, sep=';', skiprows=1)
+        #df = df.loc[: df[(df['X'] == 'Source: DOM1')].index[0] - 1, :]
+        df = df.astype('float64')
+    except:
+        st.write('Prøv å laste ned fil med berre terreng, og ikkje overlfate eller bathymetri')
     return df
 
 def transform_coords(coords):
