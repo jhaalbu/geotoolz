@@ -158,7 +158,7 @@ if kontraktboks:
         if kontraktfylke:
             nvdbfilter.pop('fylke')
 
-st.divider()
+st.write("---")
 
 vis_kart = st.checkbox('Vis kart')
 if vis_kart:
@@ -226,6 +226,5 @@ if vis_data:
         st.error('Feilmelding! Sjekk om det er motsetningar i filterkriterier, f.eks vegreferanse utanfor fylke, eller kontraktsområde.')
 
     
-st.divider()
-st.divider()
+st.write("---")
 
