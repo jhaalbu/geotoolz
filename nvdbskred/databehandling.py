@@ -10,7 +10,7 @@ import pandas as pd
 @st.cache_data
 def hent_data(filter):
 
-    skred = nvdbapiv3.nvdbFagdata(445)
+    skred = nvdbapiv4.nvdbFagdata(445)
     skred.filter(filter)
     #st.write(f'Antall skredregisteringar på strekninga: {skred.statistikk()["antall"]} stk')
     #st.write(f'Total lengde registert for registerte skredhendingar: {int(skred.statistikk()["lengde"])} meter')
@@ -58,7 +58,7 @@ def nedlasting(df):
 
 @st.cache_data
 def vegref(nord, ost, maks_avstand=50, srid=4326):
-    r = requests.get(f"https://nvdbapiles-v3.atlas.vegvesen.no/posisjon?lat={nord}&lon={ost}&maks_avstand={maks_avstand}&maks_antall=1&srid={srid}")
+    r = requests.get(f"https://nvdbapiles.atlas.vegvesen.no//posisjon?lat={nord}&lon={ost}&maks_avstand={maks_avstand}&maks_antall=1&srid={srid}")
     data = r.json()
     print(json.dumps(data[0], indent=4))
     vegreferanse = {
