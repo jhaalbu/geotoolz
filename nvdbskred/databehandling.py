@@ -10,7 +10,7 @@ import pandas as pd
 @st.cache_data
 def hent_data(filter):
 
-    skred = nvdbapiv4.nvdbFagdata(445)
+    skred = nvdbapiv3.nvdbFagdata(445)
     skred.filter(filter)
     #st.write(f'Antall skredregisteringar på strekninga: {skred.statistikk()["antall"]} stk')
     #st.write(f'Total lengde registert for registerte skredhendingar: {int(skred.statistikk()["lengde"])} meter')
