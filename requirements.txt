@@ -14,5 +14,6 @@ windrose
 nvdbapi-v3
 pyproj
 shapely
+altair<5
 geopandas
 ezdxf
